@@ -2,8 +2,10 @@
 
 Small proof-of-concept with Python scripts and diagrams for design and documentation.
 
-## Agent Diagram (PNG)
+## Agent Diagram 
 ![Banking Agent Diagram](./agent_diagram.png)
+## Architecture Diagram
+![Architecture Diagram](./architecture.png)
 
 > Regenerate with:
 ```bash
