@@ -1,67 +1,121 @@
-# Project Overview
+# Banking Agent POC
 
-This repository contains a small proof-of-concept project and diagrams used for design and documentation.
+Small proof-of-concept with Python scripts and diagrams for design and documentation.
 
-## Files of interest
-- `main.py` — main script
-- `list_models.py` — utility script
-- `test_poc.py` — test / proof-of-concept
-- `agent_diagram.dot` — Graphviz DOT diagram
-- `agent_diagram.mmd` — Mermaid diagram
-- `agent_diagram.txt` — Plain-text diagram / notes
+## Agent Diagram (PNG)
+![Banking Agent Diagram](./agent_diagram.png)
 
-## Diagrams
-- agent_diagram.dot: A Graphviz DOT file. Render with Graphviz:
-
+> Regenerate with:
 ```bash
+# Graphviz (from agent_diagram.dot)
+dot -Tpng agent_diagram.dot -o agent_diagram.png
+# or Mermaid (from agent_diagram.mmd)
+mmdc -i agent_diagram.mmd -o agent_diagram.png
+```
+
+## Files
+- `main.py` — entry point
+- `list_models.py` — utility
+- `test_poc.py` — POC/test
+- `agent_diagram.dot` — Graphviz DOT
+- `agent_diagram.mmd` — Mermaid
+- `agent_diagram.txt` — notes
+
+## Prerequisites
+- Python 3.10+
+
+## Environment
+Create a .env file or export variables:
+```bash
+# .env
+GEMINI_API_KEY="YOUR_API_KEY"
+# Optional: override default model (see list_models.py)
+MODEL_NAME="models/gemini-2.5-pro"
+```
+Notes:
+- For the offline stubbed test, you can set a dummy key to satisfy import time checks:
+  - export GEMINI_API_KEY="dummy"
+
+## Architecture Overview
+Multi-agent orchestrator with simple intent routing:
+- route_intent → intents: credit_card, faq, general
+- credit_card_agent uses credit_card_sql_tool → SQLite (credit_cards.db) for context
+- faq_agent answers strictly from embedded FAQ snippets
+- general_agent falls back to general chat
+
+Render:
+```bash
+# Mermaid (requires @mermaid-js/mermaid-cli)
+mmdc -i agent_diagram.mmd -o agent_diagram.png
+
+# Graphviz
 dot -Tpng agent_diagram.dot -o agent_diagram.png
 ```
 
-- agent_diagram.mmd: A Mermaid diagram. Render locally with a Mermaid CLI or view in Mermaid live editor (https://mermaid.live).
-
-## How to use
-1. (Optional) Create a Python virtual environment:
-
+## Setup
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt  # if you have one
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 ```
+Optional:
+- farm-haystack is listed but the POC has fallbacks; install only if you plan to use Haystack features.
 
-2. Run the main script:
-
+## Run
 ```bash
+# CLI demo (type 'exit' to quit)
 python main.py
 ```
-
-## Git: Initialize, commit, and push
-This repository currently appears not to be initialized as a Git repo in this environment. To initialize, commit, and push changes:
-
-1. Initialize and commit locally:
-
+List available models (and pick one supporting generateContent):
 ```bash
-git init
-git branch -M main
-git add .
-git commit -m "chore: add README and include diagrams"
+export GEMINI_API_KEY="YOUR_API_KEY"
+python list_models.py
+# Optionally: export MODEL_NAME="models/<your-model>"
 ```
 
-2. If you already have a remote repository, add it and push:
-
+## Test
 ```bash
-git remote add origin <REMOTE_URL>
-git push -u origin main
+# with pytest (if installed)
+python -m pytest -q
+
+# or run directly
+python test_poc.py
 ```
 
-3. If you want me to create a GitHub repo and push for you (requires `gh` CLI and authentication), I can run:
-
+## Test (offline deterministic)
+The test_poc.py stubs google.generativeai to run without network or real API calls.
 ```bash
-gh repo create --public --source=. --remote=origin --push
+# Ensure an env var is present (dummy is fine for offline test)
+export GEMINI_API_KEY="dummy"
+python test_poc.py
 ```
+What it does:
+- Injects a stub genai.GenerativeModel that returns predictable text.
+- Forces MODEL_NAME=models/test-stub.
+- Runs run_multi_agent_chat on a credit card query and asserts output:
+  - intent == "credit_card"
+  - answer starts with "STUBBED_RESPONSE"
 
-Replace `--public` with `--private` if you prefer a private repo.
+## SQLite Demo Data
+- Database file: credit_cards.db (auto-created on first run)
+- Tables: credit_cards, transactions
+- Seeded with a small sample of customers and recent transactions
+Tips:
+- To reset demo data, delete credit_cards.db and rerun main.py.
 
-If you'd like me to proceed with adding a remote and pushing, reply with the remote URL or permission to create a GitHub repo using the `gh` CLI.
+## Troubleshooting
+- google.generativeai SDK versions differ; if list_models() is missing, use list_models.py to inspect attributes or use gcloud/Vertex listings.
+- If genai.configure() fails at import time, ensure GEMINI_API_KEY is set correctly.
+- Haystack imports are optional; minimal fallbacks are included.
+- Graphviz/Mermaid are optional; install only if rendering diagrams.
 
----
-Generated README to include diagrams and usage instructions.
+## Diagrams
+- Graphviz (DOT → PNG):
+```bash
+dot -Tpng agent_diagram.dot -o agent_diagram.png
+```
+- Mermaid (MMD → PNG):
+```bash
+mmdc -i agent_diagram.mmd -o agent_diagram.png
+```
+- Live editor: https://mermaid.live
