@@ -1,0 +1,25 @@
+Banking Multi-Agent Chat - Architecture (ASCII)
+
+User (CLI)
+  |
+  v
+Orchestrator: run_multi_agent_chat
+  - route_intent(user_text)
+    -> credit_card_agent (if keywords match)
+       - calls credit_card_sql_tool -> SQLite DB (credit_cards.db)
+       - builds context and calls gemini_chat(messages)
+    -> faq_agent
+       - uses FAQ_SNIPPETS
+       - calls gemini_chat(messages)
+    -> general_agent
+       - forwards freeform user_text to gemini_chat
+
+gemini_chat(messages):
+  - instantiates genai.GenerativeModel(MODEL_NAME)
+  - formats messages into a prompt
+  - calls model.generate_content(prompt)
+  - returns resp.text
+
+Supporting files:
+ - list_models.py  (helper to list available models)
+ - test_poc.py     (offline test harness that stubs the SDK)

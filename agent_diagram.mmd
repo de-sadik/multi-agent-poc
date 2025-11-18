@@ -1,0 +1,51 @@
+%% Agent diagram for Banking Multi-Agent Chat (Mermaid)
+%% Save as agent_diagram.mmd and render via a Mermaid viewer or VS Code extension
+flowchart TD
+  subgraph User
+    U[User / CLI]
+  end
+
+  subgraph Orchestrator
+    O[run_multi_agent_chat]
+    Router[route_intent]
+  end
+
+  subgraph Agents
+    CC[credit_card_agent]
+    FAQ[faq_agent]
+    GEN[general_agent]
+  end
+
+  subgraph Tools_and_Data
+    SQL["SQLite DB (credit_cards.db)"]
+    Tool[credit_card_sql_tool]
+    FAQDATA[FAQ_SNIPPETS]
+  end
+
+  subgraph LLM
+    GEM["genai.GenerativeModel"]
+    MODEL["models/gemini-2.5-pro"]
+  end
+
+  U --> O
+  O --> Router
+  Router -->|credit_card| CC
+  Router -->|faq| FAQ
+  Router -->|general| GEN
+
+  CC --> Tool
+  Tool --> SQL
+  FAQ --> FAQDATA
+  CC --> GEM
+  FAQ --> GEM
+  GEN --> GEM
+  GEM --> MODEL
+
+  style GEM fill:#f9f,stroke:#333,stroke-width:1px
+  style MODEL fill:#ffd,stroke:#333,stroke-width:1px
+
+  click MODEL "./list_models.py" "Opens model listing helper"
+
+  %% Notes
+  classDef note fill:#fff8c6,stroke:#999,stroke-width:0.5px
+  class SQL,FAQDATA note

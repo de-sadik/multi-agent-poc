@@ -1,0 +1,11 @@
+# Minimal runtime dependencies for the POC
+# Core SDK used in the code: google.generativeai
+google-generativeai>=0.3.0
+
+# Optional: dotenv helper used in `main.py` (optional, runtime-safe shim present in code)
+python-dotenv>=1.0.0
+
+# Optional: Haystack (used only if you want full Haystack components/pipelines)
+# The project historically appears as `farm-haystack` on PyPI which provides
+# the `haystack` module name. Install only if you plan to use Haystack features.
+farm-haystack>=1.0.0

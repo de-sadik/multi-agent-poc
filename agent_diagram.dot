@@ -1,0 +1,31 @@
+// DOT graph for Banking Multi-Agent Chat
+digraph AgentDiagram {
+  rankdir=LR;
+  node [shape=box, style=rounded, fontsize=12];
+
+  User [label="User / CLI", shape=oval];
+  Orchestrator [label="run_multi_agent_chat\n(route_intent)", shape=box];
+  CreditCard [label="credit_card_agent", shape=box3d];
+  FAQAgent [label="faq_agent", shape=box3d];
+  GeneralAgent [label="general_agent", shape=box3d];
+
+  CreditTool [label="credit_card_sql_tool", shape=component];
+  SQLiteDB [label="SQLite DB\n(credit_cards.db)", shape=cylinder];
+  FAQData [label="FAQ_SNIPPETS", shape=note];
+
+  GenModel [label="genai.GenerativeModel\n(MODEL_NAME)", shape=ellipse, style=filled, fillcolor="#f9f2ff"];
+
+  User -> Orchestrator;
+  Orchestrator -> CreditCard [label="credit_card"];
+  Orchestrator -> FAQAgent [label="faq"];
+  Orchestrator -> GeneralAgent [label="general"];
+
+  CreditCard -> CreditTool;
+  CreditTool -> SQLiteDB;
+  FAQAgent -> FAQData;
+
+  CreditCard -> GenModel;
+  FAQAgent -> GenModel;
+  GeneralAgent -> GenModel;
+
+}
