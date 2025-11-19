@@ -1,6 +1,6 @@
 # Banking Agent POC
 
-Small proof-of-concept with Python scripts and diagrams for design and documentation.
+Small proof-of-concept with Python scripts
 
 ## Agent Diagram 
 ![Banking Agent Diagram](./agent_diagram.png)
