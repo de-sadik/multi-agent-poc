@@ -1,17 +1,16 @@
-# ...existing code...
+
 import os
 import sqlite3
 from typing import List, Dict, Any
 
-# dotenv helper (optional)
+# dotenv helper 
 try:
     from dotenv import load_dotenv
 except Exception:
     def load_dotenv():
         return None
 
-# Haystack 2.x imports with robust fallbacks. Some haystack
-# distributions expose different names (e.g., `component` vs `Component`).
+
 try:
     from haystack import Component, Pipeline
 except Exception:
