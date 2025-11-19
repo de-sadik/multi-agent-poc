@@ -1,6 +1,20 @@
-# Banking Agent POC
+# Multi‑Agent Banking POC (Haystack + Gemini)
 
-Small proof-of-concept with Python scripts
+Lightweight proof‑of‑concept demonstrating a small multi‑agent architecture that combines:
+- a simple intent router,
+- a SQLite-backed credit-card tool,
+- optional Haystack pipelines, and
+- a Gemini (google.generativeai) LLM integration.
+
+Key files
+- CLI demo and orchestrator: [`main.py`](main.py) (provides [`run_multi_agent_chat`](main.py) and `credit_card_tool`)
+- Model helper: [`list_models.py`](list_models.py)
+- Offline test harness (stubbed SDK): [`test_poc.py`](test_poc.py)
+- Banking POC variant (Haystack + agent modules): [`haystack-banking-multi-agent-poc/src/main.py`](haystack-banking-multi-agent-poc/src/main.py)
+- Haystack pipelines / agents:
+  - [`CreditCardPipeline`](haystack-banking-multi-agent-poc/src/pipelines/credit_card_pipeline.py)
+  - [`SQLPipeline`](haystack-banking-multi-agent-poc/src/pipelines/sql_pipeline.py)
+  - [`RouterAgent`](haystack-banking-multi-agent-poc/src/agents/router_agent.py)
 
 ## Agent Diagram 
 ![Banking Agent Diagram](./agent_diagram.png)
@@ -15,18 +29,16 @@ dot -Tpng agent_diagram.dot -o agent_diagram.png
 mmdc -i agent_diagram.mmd -o agent_diagram.png
 ```
 
-## Files
-- `main.py` — entry point
-- `list_models.py` — utility
-- `test_poc.py` — POC/test
-- `agent_diagram.dot` — Graphviz DOT
-- `agent_diagram.mmd` — Mermaid
-- `agent_diagram.txt` — notes
+## Quickstart
 
-## Prerequisites
-- Python 3.10+
+1. Create virtual env and install deps
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-## Environment
+2. Configure Environment
 Create a .env file or export variables:
 ```bash
 # .env
@@ -39,11 +51,13 @@ Notes:
   - export GEMINI_API_KEY="dummy"
 
 ## Architecture Overview
-Multi-agent orchestrator with simple intent routing:
-- route_intent → intents: credit_card, faq, general
-- credit_card_agent uses credit_card_sql_tool → SQLite (credit_cards.db) for context
-- faq_agent answers strictly from embedded FAQ snippets
-- general_agent falls back to general chat
+This project demonstrates a **Multi-Agent Orchestrator** integrating with **Haystack** concepts:
+- **Router**: `route_intent` directs queries to specific agents (credit_card, faq, general).
+- **Agents**:
+  - `credit_card_agent`: Uses `credit_card_sql_tool` to query SQLite (`credit_cards.db`) for context.
+  - `faq_agent`: Answers strictly from embedded FAQ snippets.
+  - `general_agent`: Falls back to general chat.
+- **Integration**: Shows how to combine custom tools, SQL databases, and LLMs (Gemini) in a cohesive workflow.
 
 Render:
 ```bash
@@ -53,15 +67,6 @@ mmdc -i agent_diagram.mmd -o agent_diagram.png
 # Graphviz
 dot -Tpng agent_diagram.dot -o agent_diagram.png
 ```
-
-## Setup
-```bash
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
-Optional:
-- farm-haystack is listed but the POC has fallbacks; install only if you plan to use Haystack features.
 
 ## Run
 ```bash
